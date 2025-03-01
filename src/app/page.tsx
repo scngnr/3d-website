@@ -118,14 +118,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="flex-grow pt-24 p-8 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">3D Logo Fiyat Hesaplayıcı</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              20 yıllık tecrübemiz ve son teknoloji ekipmanlarımızla, markanızı üç boyutlu dünyaya taşıyoruz.
-              Özel tasarım 3D logolarımız ile işletmenize profesyonel bir görünüm kazandırın.
-            </p>
-          </div>
+        <div className="max-w-7xl mx-auto mt-10">
           
           {!preview ? (
             <div className="bg-white rounded-xl shadow-lg p-6 mb-8 transition-all duration-300 hover:shadow-xl">
