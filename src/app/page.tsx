@@ -13,6 +13,8 @@ export default function Home() {
   const [cmDimensions, setCmDimensions] = useState({ width: 0, height: 0 });
   const [price, setPrice] = useState<number>(0);
   const [complexity, setComplexity] = useState<number>(1);
+  const [glowColor, setGlowColor] = useState<string>('#00ffff');
+  const [glowIntensity, setGlowIntensity] = useState<number>(1.5);
 
   const calculateComplexity = (imageData: ImageData) => {
     let uniqueColors = new Set();
@@ -37,6 +39,14 @@ export default function Home() {
     const sizeFactor = Math.min(areaCm / maxAreaCm, 2);
     const finalPrice = basePrice * (1 + sizeFactor) * complexity;
     setPrice(Math.round(finalPrice));
+  };
+
+  const handleGlowColorChange = (value: string) => {
+    setGlowColor(value);
+  };
+
+  const handleGlowIntensityChange = (value: string) => {
+    setGlowIntensity(parseFloat(value));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,6 +111,8 @@ export default function Home() {
                   imageUrl={preview} 
                   width={cmDimensions.width} 
                   height={cmDimensions.height}
+                  glowColor={glowColor}
+                  glowIntensity={glowIntensity}
                 />
               </div>
             </div>
@@ -110,6 +122,32 @@ export default function Home() {
                 <div>
                   <h2 className="text-xl font-semibold mb-4">Özellikler</h2>
                   <div className="space-y-4">
+                    <div className="space-y-4">
+                      <div>
+                        <p className="font-medium mb-2">Yazı Rengi:</p>
+                        <input 
+                          type="color" 
+                          value={glowColor}
+                          onChange={(e) => handleGlowColorChange(e.target.value)}
+                          className="w-full h-8"
+                        />
+                      </div>
+                      
+                      <div>
+                        <p className="font-medium mb-2">Parlaklık:</p>
+                        <input 
+                          type="range" 
+                          min="0.5" 
+                          max="3" 
+                          step="0.1"
+                          value={glowIntensity}
+                          onChange={(e) => handleGlowIntensityChange(e.target.value)}
+                          className="w-full"
+                        />
+                        <p className="text-sm text-gray-600 mt-1">{glowIntensity.toFixed(1)}</p>
+                      </div>
+                    </div>
+                    
                     <div>
                       <p className="font-medium mb-2">Boyutlar (cm):</p>
                       <div className="grid grid-cols-2 gap-4">
