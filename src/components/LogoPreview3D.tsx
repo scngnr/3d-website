@@ -69,29 +69,66 @@ export default function LogoPreview3D({ imageUrl, width = 0, height = 0, glowCol
         // Draw the original image
         glowCtx.drawImage(tempImg, 0, 0);
         
-        // Apply color threshold to detect likely text areas (dark pixels on light background)
-        const threshold = 100; // Adjust based on your needs
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-          const a = data[i + 3];
-          
-          // Calculate brightness (simple average)
-          const brightness = (r + g + b) / 3;
-          
-          // If pixel is dark (likely text)
-          if (brightness < threshold && a > 200) {
-            // Make it glow with the selected color
-            const hexColor = glowColor.replace('#', '');
-            const r = parseInt(hexColor.substring(0, 2), 16);
-            const g = parseInt(hexColor.substring(2, 4), 16);
-            const b = parseInt(hexColor.substring(4, 6), 16);
+        // Apply edge detection and color analysis to detect both text and drawing elements
+        const edgeThreshold = 30; // Threshold for edge detection
+        const colorThreshold = 100; // Threshold for color detection
+        
+        // Create arrays for edge detection
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Function to get pixel index
+        const getIndex = (x: number, y: number) => (y * width + x) * 4;
+        
+        // Process each pixel
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            const idx = getIndex(x, y);
             
-            // Set the pixel to the glow color
-            data[i] = r;
-            data[i + 1] = g;
-            data[i + 2] = b;
+            // Get current pixel values
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            const a = data[idx + 3];
+            
+            // Skip transparent pixels
+            if (a < 200) continue;
+            
+            // Calculate brightness
+            const brightness = (r + g + b) / 3;
+            
+            // Check surrounding pixels for edges
+            const leftIdx = getIndex(x - 1, y);
+            const rightIdx = getIndex(x + 1, y);
+            const topIdx = getIndex(x, y - 1);
+            const bottomIdx = getIndex(x, y + 1);
+            
+            const leftBrightness = (data[leftIdx] + data[leftIdx + 1] + data[leftIdx + 2]) / 3;
+            const rightBrightness = (data[rightIdx] + data[rightIdx + 1] + data[rightIdx + 2]) / 3;
+            const topBrightness = (data[topIdx] + data[topIdx + 1] + data[topIdx + 2]) / 3;
+            const bottomBrightness = (data[bottomIdx] + data[bottomIdx + 1] + data[bottomIdx + 2]) / 3;
+            
+            // Calculate edge intensity
+            const edgeIntensity = Math.max(
+              Math.abs(brightness - leftBrightness),
+              Math.abs(brightness - rightBrightness),
+              Math.abs(brightness - topBrightness),
+              Math.abs(brightness - bottomBrightness)
+            );
+            
+            // Apply glow if pixel is part of text or drawing
+            if (brightness < colorThreshold || edgeIntensity > edgeThreshold) {
+              // Make it glow with the selected color
+              const hexColor = glowColor.replace('#', '');
+              const newR = parseInt(hexColor.substring(0, 2), 16);
+              const newG = parseInt(hexColor.substring(2, 4), 16);
+              const newB = parseInt(hexColor.substring(4, 6), 16);
+              
+              // Set the pixel to the glow color
+              data[idx] = newR;
+              data[idx + 1] = newG;
+              data[idx + 2] = newB;
+            }
           }
         }
         
